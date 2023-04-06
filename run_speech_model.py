@@ -28,7 +28,7 @@ flags = DictStruct(**flags_json)
 
 print(flags.model_name)
 
-interpreter = tf.lite.Interpreter(model_path=model_path)
+interpreter = tflite.Interpreter(model_path=model_path)
 interpreter.allocate_tensors()
 
 input_details = interpreter.get_input_details()
