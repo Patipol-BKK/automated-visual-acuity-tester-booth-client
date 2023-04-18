@@ -1,15 +1,16 @@
 import os
 import sys
 import json
-import tflite_runtime.interpreter as tflite
+# import tflite_runtime.interpreter as tflite
 from kws_streaming.train import inference
-# import tensorflow as tf
+import tensorflow as tf
 import numpy as np
 import librosa
 import sounddevice as sd
 
-args = sys.argv[1:]
-model_name = args[0]    
+# args = sys.argv[1:]
+# model_name = args[0]    
+model_name = 'ds_tc_resnet_numbers_longtrain'
 
 tflite_models_folder_path = os.path.join('tflite_models', model_name)
 model_path = os.path.join(tflite_models_folder_path, 'model.tflite')
@@ -28,7 +29,7 @@ flags = DictStruct(**flags_json)
 
 print(flags.model_name)
 
-interpreter = tflite.Interpreter(model_path=model_path)
+interpreter = tf.lite.Interpreter(model_path=model_path)
 interpreter.allocate_tensors()
 
 input_details = interpreter.get_input_details()
