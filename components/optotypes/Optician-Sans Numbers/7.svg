@@ -1,6 +1,1 @@
-<svg viewBox="55 0 400 500" transform="rotate(180 50 50) scale(-1,1)"> 	
-	<g> 		
-		<path d="M255 0h-110l195 410h-285v90h400v-80z"></path> 		
-	</g> 
-</svg>
-
+<svg viewBox="0 0 400 500"><path d="M 200 500 h -110 l 195 -410 h -285 v -90 h 400 v 80 z"/></svg>
