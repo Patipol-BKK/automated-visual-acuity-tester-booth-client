@@ -95,6 +95,7 @@ if __name__ == '__main__':
 
     predicted_speech = ''
     set_corrected = 0
+    current_set_results = []
 
 
     test = TestScreen(list(optotypes.values())[cur_optotype], 2, 5, cur_logMAR, display)
@@ -197,6 +198,9 @@ if __name__ == '__main__':
         if predicted_speech != '':
             if predicted_speech == pointed_optotype:
                 set_corrected += 1
+                current_set_results.append(1)
+            else:
+                current_set_results.append(0)
             cur_pointed += 1
             update_screen = True
 
@@ -216,13 +220,15 @@ if __name__ == '__main__':
                     update_screen = True
                     update_optotypes = True
                     set_corrected = 0
+            set_corrected = 0
+            current_set_results = []
 
         if update_screen:
             display.fill((255, 255, 255))
             if update_optotypes:
                 test = TestScreen(list(optotypes.values())[cur_optotype], 2, 5, cur_logMAR, display)
                 update_optotypes = False
-            test.render(cur_pointed)
+            test.render(cur_pointed, current_set_results)
             update_screen = False
 
         logMARs = list(corrects.keys())

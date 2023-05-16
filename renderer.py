@@ -58,8 +58,11 @@ class TestScreen:
             self.optotype.height)
         self.line = Line(self.optotype.choose_random(count), figure_size)
 
-    def render(self, pointed_idx):
+    def render(self, pointed_idx, current_results):
         self.line.render(self.display)
+
+        center_x = DISPLAY_WIDTH / 2
+        center_y = DISPLAY_HEIGHT / 2
 
         # Arrow
         if pointed_idx >= 0:
@@ -67,8 +70,18 @@ class TestScreen:
             arrow_img = arrow.render(get_figure_size(
                 self.logMAR * 1.2, self.distance, 5))
             self.display.blit(arrow_img,
-                              (DISPLAY_WIDTH / 2 - self.line.line_width / 2 + self.line.figure_offsets[pointed_idx] - arrow_img.get_size()[0] / 2,
-                               DISPLAY_HEIGHT / 2 - get_figure_size(self.logMAR * 1.2, self.distance, 8.6)))
+                              (center_x - self.line.line_width / 2 + self.line.figure_offsets[pointed_idx] - arrow_img.get_size()[0] / 2,
+                               center_y - get_figure_size(self.logMAR * 1.2, self.distance, 8.6)))
+
+        # Corrects
+        for idx, is_correct in enumerate(current_results):
+            check_cross = CheckCross()
+            check_cross_size = DISPLAY_HEIGHT / 6
+            check_cross_gap = DISPLAY_HEIGHT / 15
+            check_cross_img = check_cross.render(is_correct, DISPLAY_HEIGHT / 6)
+            self.display.blit(check_cross_img,
+                          (center_x - (check_cross_size*5 + check_cross_gap*4)/2 + (check_cross_size + check_cross_gap) * idx,
+                           center_y + DISPLAY_HEIGHT / 5))
 
         # Render current test info
         str_optotype = 'Optotype: ' + self.optotype.name

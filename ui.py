@@ -35,3 +35,23 @@ class Arrow:
             f' transform="scale({scaling_ratio})"' + \
             self.svg_string[start + 4:]
         return pygame.image.load(io.BytesIO(scaled_svg_string.encode()))
+
+class CheckCross:
+    def __init__(self):
+        self.check_svg_string = open('components/elements/check.svg', "rt").read()
+        self.cross_svg_string = open('components/elements/cross.svg', "rt").read()
+        pygame_img = pygame.image.load(io.BytesIO(self.check_svg_string.encode()))
+        self.size = pygame_img.get_size()
+
+    def render(self, is_correct, height):
+        scaling_ratio = height / self.size[1]
+        if is_correct:
+            svg_string = self.check_svg_string
+        else:
+            svg_string = self.cross_svg_string
+
+        start = svg_string.find('<svg')
+        scaled_svg_string = svg_string[:start + 4] + \
+            f' transform="scale({scaling_ratio})"' + \
+            svg_string[start + 4:]
+        return pygame.image.load(io.BytesIO(scaled_svg_string.encode()))
