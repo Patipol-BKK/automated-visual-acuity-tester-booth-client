@@ -128,3 +128,46 @@ class TestScreen:
             DISPLAY_WIDTH - 40 - cm_to_pixels(scale_length) / 2, DISPLAY_HEIGHT - 45)))
 
         return self.line.figures
+
+    def render_result(self, logMAR):
+        center_x = DISPLAY_WIDTH / 2
+        center_y = DISPLAY_HEIGHT / 2
+
+        str_logMAR = 'Result logMAR: ' + str(logMAR)
+        str_snellen = 'Result Snellen: ' + snellen_dict[logMAR]
+
+        FONT = 'components/fonts/' + config['font']
+        big_font = pygame.font.Font(FONT, 50)
+
+        text_logMAR = big_font.render(str_logMAR, True, (0, 0, 0))
+        text_width = text_logMAR.get_size()[0]
+
+        text_snellen = big_font.render(str_snellen, True, (0, 0, 0))
+        text_width = max(text_width, text_snellen.get_size()[0])
+
+        self.display.blit(text_logMAR, (center_x - text_width/2, center_y))
+        self.display.blit(text_snellen, (center_x - text_width/2, center_y + 70))
+
+class DisplayScreen:
+    def __init__(self, distance, display):
+        self.distance = distance
+        self.display = display
+        
+    def render(self, header_str, msg_str):
+        self.display.fill((255, 255, 255))
+        center_x = DISPLAY_WIDTH / 2
+        center_y = DISPLAY_HEIGHT / 2
+
+        FONT = 'components/fonts/' + config['font']
+        big_font = pygame.font.Font(FONT, 70)
+        small_font = pygame.font.Font(FONT, 35)
+
+        text_header = big_font.render(header_str, True, (0, 0, 0))
+        text_width = text_header.get_size()[0]
+
+        self.display.blit(text_header, (center_x - text_width/2, center_y - 70))
+
+        text_msg = small_font.render(msg_str, True, (0, 0, 0))
+        text_width = text_msg.get_size()[0]
+
+        self.display.blit(text_msg, (center_x - text_width/2, center_y + 20))

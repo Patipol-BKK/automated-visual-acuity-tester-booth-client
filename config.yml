@@ -1,7 +1,7 @@
 display:
   # Resolution
-  width: 1920
-  height: 1080
+  width: 2560
+  height: 1440
 
   # Aspect ratio
   aspect_ratio: "16_9"
@@ -10,3 +10,5 @@ display:
   screen_size: 39
 
 font: "Roboto-Regular.ttf"
+
+distance: 2
