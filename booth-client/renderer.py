@@ -187,7 +187,7 @@ class OptionScreen:
             'Resolution' : [ '1280 x 720', '1600 x 900', '1920 x 1080', '2560 x 1440', '3840 x 2160', '7680 x 4320'],
             'Testing Type' : [ 'Single Eye Both Sides', 'Single Eye One Side', 'Both Eyes'], 
             'Testing Distance (Meters)' : ['1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0', '5.5', '6.0', '6.5', '7.0', '7.5', '8.0', '8.5', '9.0', '9.5', '10.0'],
-            'Optotypes per Set' : ['1', '2', '3', '4', '5'],
+            # 'Optotypes per Set' : ['1', '2', '3', '4', '5'],
             'Run Introduction Video' : ['Yes', 'No']
         }
 
@@ -196,7 +196,7 @@ class OptionScreen:
             'Resolution' : f'{str(config["display"]["width"])} x {str(config["display"]["height"])}',
             'Testing Type' : str(config['testing']['type']), 
             'Testing Distance (Meters)' : str(config['testing']['distance']),
-            'Optotypes per Set' : str(config['testing']['optotypes_num']),
+            # 'Optotypes per Set' : str(config['testing']['optotypes_num']),
             'Run Introduction Video' : 'Yes' if config['run_intro'] else 'No'
         }
 
@@ -295,7 +295,7 @@ class OptionScreen:
 
         config['testing']['type'] = self.current_options['Testing Type'].replace(' - Custom', '')
         config['testing']['distance'] = round(float(self.current_options['Testing Distance (Meters)'].replace(' - Custom', '')), 1)
-        config['testing']['optotypes_num'] = int(self.current_options['Optotypes per Set'].replace(' - Custom', ''))
+        # config['testing']['optotypes_num'] = int(self.current_options['Optotypes per Set'].replace(' - Custom', ''))
 
         config['run_intro'] = True if self.current_options['Run Introduction Video'].replace(' - Custom', '') == 'Yes' else False
 
