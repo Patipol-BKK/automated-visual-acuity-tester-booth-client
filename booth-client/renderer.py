@@ -60,7 +60,7 @@ class TestScreen:
             self.optotype.height)
         self.line = Line(self.optotype.choose_random(count), figure_size)
 
-    def render(self, pointed_idx, current_results):
+    def render(self, pointed_idx, current_results, which_test):
         self.line.render(self.display)
 
         center_x = DISPLAY_WIDTH / 2
@@ -74,7 +74,6 @@ class TestScreen:
             arrow_img = arrow.render(get_figure_size(
                 self.logMAR * 1.2, self.distance, OPTOTYPES_NUM))
 
-            print(self.line.figure_offsets, pointed_idx)
             self.display.blit(arrow_img,
                               (center_x - self.line.line_width / 2 + self.line.figure_offsets[pointed_idx] - arrow_img.get_size()[0] / 2,
                                center_y - get_figure_size(self.logMAR * 1.2, self.distance, 8.6)))
@@ -114,12 +113,15 @@ class TestScreen:
         text = small_font.render(str_snellen, True, (0, 0, 0))
         self.display.blit(text, (10, 100))
 
+        text = small_font.render(f'Testing type : {config["testing"]["type"]} ({which_test})', True, (0, 0, 0))
+        self.display.blit(text, (10, 130))
+
         if pointed_idx >= 0:
             str_pointed = 'Pointed Figure: ' + \
                 self.line.figures[pointed_idx].name + \
                 '   |  ( Index = ' + str(pointed_idx + 1) + ' )'
             text = small_font.render(str_pointed, True, (0, 0, 0))
-            self.display.blit(text, (10, 130))
+            self.display.blit(text, (10, 160))
 
         # Scale Bar
         scale_length = 5
@@ -185,7 +187,7 @@ class OptionScreen:
         self.options = {
             'Display Size (Inches)' : ['13.3', '14.0', '15.6', '17.3', '19.0', '21.5', '23.0', '24.0', '27.0', '32.0', '34.0', '38.0', '43.0', '49.0', '55.0', '65.0', '70.0', '75.0', '80.0', '85.0', '86.0', '90.0'],
             'Resolution' : [ '1280 x 720', '1600 x 900', '1920 x 1080', '2560 x 1440', '3840 x 2160', '7680 x 4320'],
-            'Testing Type' : [ 'Single Eye Both Sides', 'Single Eye One Side', 'Both Eyes'], 
+            'Testing Type' : [ 'Single Eye Both Sides', 'Single Eye Left Side', 'Single Eye Right Side', 'Both Eyes Together'], 
             'Testing Distance (Meters)' : ['1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0', '5.5', '6.0', '6.5', '7.0', '7.5', '8.0', '8.5', '9.0', '9.5', '10.0'],
             # 'Optotypes per Set' : ['1', '2', '3', '4', '5'],
             'Run Introduction Video' : ['Yes', 'No']

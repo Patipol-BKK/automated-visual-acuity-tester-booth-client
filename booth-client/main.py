@@ -18,11 +18,6 @@ DISPLAY_HEIGHT = config['display']['height']
 ASPECT_RATIO = config['display']['aspect_ratio'].split('_')
 ASPECT_RATIO = [int(x) for x in ASPECT_RATIO]
 
-if config['testing']['type'] == 'Single Eye Both Sides':
-    TEST_NUM = 2
-else:
-    TEST_NUM = 1
-
 OPTOTYPES_NUM = config['testing']['optotypes_num']
 
 # Display Dimensions in cm
@@ -153,6 +148,8 @@ if __name__ == '__main__':
     option_selected_index = 0
     option_selection_input = 'idle'
 
+    final_scores = []
+
     restart = False
     while not crashed:
         for event in pygame.event.get():
@@ -217,7 +214,7 @@ if __name__ == '__main__':
                             continue
 
             # Key selection in testing screen
-            elif state == 'test':
+            elif 'test' in state:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
                         if cur_logMAR < 1:
@@ -262,7 +259,7 @@ if __name__ == '__main__':
 
         # Render main screen
         if state == 'idle':
-            msg_renderer.render('Visual Acuity Testing Booth', 'Please put on the goggles to start')
+            msg_renderer.render('Visual Acuity Testing - ' + config['testing']['type'], 'Please put on the goggles to start')
             pygame.display.update()
 
         # Render option screen
@@ -278,7 +275,6 @@ if __name__ == '__main__':
             if config['run_intro']:
                 intro_player.start()
                 intro_player.join()
-                state = 'test'
                 wav_file = "beep.mp3"
                 player = MediaPlayer(wav_file)
                 while True:
@@ -289,11 +285,44 @@ if __name__ == '__main__':
                     else:
                         # Audio playback is finished
                         break
-            else:
-                state = 'test'
+
+            if config['testing']['type'] == 'Single Eye Both Sides':
+                state = 'test1'
+            elif config['testing']['type'] == 'Single Eye Left Side':
+                state = 'test11'
+            elif config['testing']['type'] == 'Single Eye Right Side':
+                state = 'test22'
+            elif config['testing']['type'] == 'Both Eyes Together':
+                state = 'test3'
+
+            if 'test1' in state:
+                test_state = 'Left Eye'
+            elif 'test2' in state:
+                test_state = 'Right Eye'
+            else :
+                test_state = 'Both Eyes'
+
+            msg_renderer.render(f'Testing {test_state}', '')
+            pygame.display.update()
+            pygame.time.delay(500)
+
+            cur_logMAR = 1
+            cur_optotype = 3
+            cur_pointed = 0
+            update_screen = True
+            update_optotypes = True
+
+            predicted_speech = ''
+            set_corrected = 0
+            current_set_results = []
+            final_scores = []
+            
+            corrects = {}
+            for logMAR in snellen_dict.keys():
+                corrects[logMAR] = []
 
         # Render testing screen
-        elif state == 'test':
+        elif 'test' in state:
 
             # Record audio
             signal = sd.rec(flags.desired_samples, samplerate=flags.sample_rate, channels=1)
@@ -380,8 +409,13 @@ if __name__ == '__main__':
                         update_screen = True
                         update_optotypes = True
                         set_corrected = 0
-                
-                test.render(len(optotypes) - 1, current_set_results)
+                if 'test1' in state:
+                    test_state = 'Left Eye'
+                elif 'test2' in state:
+                    test_state = 'Right Eye'
+                else :
+                    test_state = 'Both Eyes'
+                test.render(len(optotypes) - 1, current_set_results, test_state)
                 
                 pygame.display.update()
                 pygame.time.delay(500)
@@ -396,7 +430,13 @@ if __name__ == '__main__':
                 if update_optotypes:
                     test = TestScreen(list(optotypes.values())[cur_optotype], DISTANCE, OPTOTYPES_NUM, cur_logMAR, display)
                     update_optotypes = False
-                test.render(cur_pointed, current_set_results)
+                if 'test1' in state:
+                    test_state = 'Left Eye'
+                elif 'test2' in state:
+                    test_state = 'Right Eye'
+                else :
+                    test_state = 'Both Eyes'
+                test.render(cur_pointed, current_set_results, test_state)
                 # test.render_result(logMAR)
                 update_screen = False
 
@@ -406,10 +446,44 @@ if __name__ == '__main__':
                 
                 if len(corrects[logMAR]) >= 2:
                     if corrects[logMAR][-1] >= OPTOTYPES_NUM - 1 and corrects[logMAR][-2] >= OPTOTYPES_NUM - 1:
-                        state = 'result'
+                        if state == 'test1':
+                            final_scores.append(('Left Eye', logMAR, snellen_dict[logMAR]))
+                            cur_logMAR = 1
+                            cur_optotype = 3
+                            cur_pointed = 0
+                            update_screen = True
+                            update_optotypes = True
+
+                            predicted_speech = ''
+                            set_corrected = 0
+                            current_set_results = []
+                            corrects = {}
+                            for logMAR in snellen_dict.keys():
+                                corrects[logMAR] = []
+                            state = 'test2'
+
+                            msg_renderer.render(f'Testing Right Eye', '')
+                            pygame.display.update()
+                            pygame.time.delay(500)
+
+                        elif state == 'test11':
+                            final_scores.append(('Left Eye', logMAR, snellen_dict[logMAR])) 
+                            state = 'result'
+
+                        elif state == 'test2' or state == 'test22':
+                            final_scores.append(('Right Eye', logMAR, snellen_dict[logMAR])) 
+                            state = 'result'
+
+                        elif state == 'test3':
+                            final_scores.append(('Both Eyes', logMAR, snellen_dict[logMAR])) 
+                            state = 'result'
         elif state == 'result':
-            msg_renderer.render('Testing Results', f'LogMAR : {logMAR} | Snellen : {snellen_dict[logMAR]}')
-            pygame.display.update()
+            if len(final_scores) == 2:
+                msg_renderer.render(f'Testing Results ({final_scores[0][0]}, {final_scores[1][0]})', f'LogMAR : ({final_scores[0][1]},{final_scores[1][1]}) | Snellen : ({final_scores[0][2]},{final_scores[1][2]})')
+                pygame.display.update()
+            else:
+                msg_renderer.render(f'Testing Results ({final_scores[0][0]})', f'LogMAR : {final_scores[0][1]} | Snellen : {final_scores[0][2]}')
+                pygame.display.update()
         pygame.display.update()
 
     print('Exiting...')
